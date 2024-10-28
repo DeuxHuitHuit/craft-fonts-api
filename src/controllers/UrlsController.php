@@ -15,23 +15,17 @@ class UrlsController extends \craft\web\Controller
         // Read the /web/fonts folder to get the font filenames
         $dir = Craft::getAlias('@webroot/fonts');
         if (!is_dir($dir)) {
-            return $this->asJson(['error' => "The fonts directory `$dir` does not exist"]);
+            return $this->asJson(['error' => "The fonts directory `$dir` does not exist"])->setStatusCode(404);
         }
 
+        // Get the urls of the files and directories
         $result = $this->recursiveScanDir($dir);
-        if (empty($result['dirs'])) {
-            // Return the urls only, like the non-recursive version did
-            return $this->asJson($result['files']);
-        } else if (empty($result['files'])) {
-            // Return the dirs only
-           return $this->asJson($result['dirs']);
-        }
 
         // Return the result as a JSON response
         return $this->asJson($result);
     }
 
-    private function recursiveScanDir(string $dir): array
+    private function recursiveScanDir(string $dir, array $parents = []): array
     {
         $files = [];
         $dirs = [];
@@ -41,16 +35,18 @@ class UrlsController extends \craft\web\Controller
                 continue;
             }
             if (is_dir($dir . '/' . $inode)) {
-                $dirs[$inode] = $this->recursiveScanDir($dir . '/' . $inode);
+                $newParents = array_merge($parents, [$inode]);
+                $dirs[$inode] = $this->recursiveScanDir($dir . '/' . $inode, $newParents);
             } else {
-                $files[] = $inode;
+                $currentParents = empty($parents) ? '' : implode('/', $parents) . '/';
+                $files[] = Craft::getAlias("@web/fonts/{$currentParents}{$inode}");
             }
         }
         if (empty($files)) {
-            return ['dirs' => $dirs];
+            return $dirs;
         } else if (empty($dirs)) {
-            return ['files' => $files];
+            return $files;
         }
-        return ['files' => $files, 'dirs' => $dirs];
+        return array_merge($files, $dirs);
     }
 }
