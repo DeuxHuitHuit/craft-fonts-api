@@ -22,7 +22,7 @@
     "docs": "https://github.com/DeuxHuitHuit/craft-fonts-api/blob/main/README.md"
   },
   "require": {
-    "php": "8.2.*|8.3.*",
+    "php": "8.2.*|8.3.*|8.4.*",
     "craftcms/cms": "^5"
   },
   "autoload": {
