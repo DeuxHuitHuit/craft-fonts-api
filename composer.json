@@ -2,7 +2,7 @@
   "name": "deuxhuithuit/craft-fonts-api",
   "description": "Adds a simple API to get fonts hosted on the server",
   "type": "craft-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "keywords": [
     "api",
     "fonts",
